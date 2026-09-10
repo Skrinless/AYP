@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AYP CMS — Content Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#211C16;--muted:#8A8177;--line:#E7E1D5;--soft:#FAF8F3;--soft2:#F1EAD9;
+  --maroon:#8A1F2D;--maroon-deep:#651722;--gold:#B78A4C;--maroon-soft:#F5E9EA;
+  --ok:#2f7d4f;--sans:'IBM Plex Sans',system-ui,sans-serif;--serif:'Fraunces',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);color:var(--ink);background:var(--soft);line-height:1.5;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
+
+.top{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:relative;z-index:20}
+.brand{font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:-.3px;display:flex;align-items:baseline;gap:0}
+.brand .a{color:var(--maroon)}
+.brand .tag{font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-left:12px;font-weight:600}
+.top-actions{display:flex;gap:10px;align-items:center}
+.status{font-size:12.5px;color:var(--muted);margin-right:6px;min-width:118px;text-align:right}
+.status.saved{color:var(--ok)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:7px}
+.btn:hover{border-color:var(--maroon);color:var(--maroon)}
+.btn.primary{background:var(--maroon);color:#fff;border-color:var(--maroon)}
+.btn.primary:hover{background:var(--maroon-deep);color:#fff}
+.btn.ghost{background:transparent}
+
+.wrap{display:flex;height:calc(100vh - 62px)}
+.side{width:230px;background:#fff;border-right:1px solid var(--line);overflow-y:auto;flex-shrink:0;padding:14px 0}
+.side h4{font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:14px 22px 8px}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 22px;font-size:14px;color:var(--ink);border-left:3px solid transparent;transition:.12s}
+.side a:hover{background:var(--soft)}
+.side a.active{background:var(--maroon-soft);border-left-color:var(--maroon);color:var(--maroon);font-weight:600}
+.side a .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);opacity:.55}
+
+.editor{flex:1;overflow-y:auto;padding:30px 34px 90px}
+.editor-inner{max-width:660px}
+.sec-title{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:-.4px;margin-bottom:6px}
+.sec-desc{font-size:14px;color:var(--muted);margin-bottom:26px}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.field .hint{font-weight:400;color:var(--muted);font-size:11.5px}
+.field input[type=text],.field textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--ink);background:#fff;transition:border-color .15s}
+.field input[type=text]:focus,.field textarea:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px var(--maroon-soft)}
+.field textarea{resize:vertical;min-height:70px;line-height:1.55}
+
+.card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px;margin-bottom:14px;position:relative}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-head .idx{font-family:var(--serif);font-size:14px;color:var(--gold);font-weight:600}
+.card-tools{display:flex;gap:4px}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:.12s}
+.icon-btn:hover{border-color:var(--maroon);color:var(--maroon)}
+.icon-btn.danger:hover{border-color:#c0392b;color:#c0392b}
+.add-btn{width:100%;border:1.5px dashed var(--line);background:var(--soft);color:var(--muted);padding:11px;border-radius:10px;font-size:13px;font-weight:600;transition:.15s}
+.add-btn:hover{border-color:var(--maroon);color:var(--maroon);background:var(--maroon-soft)}
+.strrow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.strrow input{flex:1}
+.imgctl{display:flex;gap:12px;align-items:flex-start}
+.imgthumb{width:72px;height:72px;border-radius:8px;border:1px solid var(--line);background:var(--soft);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:1px;color:var(--muted);overflow:hidden}
+.imgthumb.has{background:#fff}
+.imgthumb img{width:100%;height:100%;object-fit:cover}
+.imgmeta{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.imgpath{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--ink);background:#fff}
+.imgpath:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px var(--maroon-soft)}
+.imgbtns{display:flex;gap:8px}
+.mini-btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center}
+.mini-btn:hover{border-color:var(--maroon);color:var(--maroon)}
+.mini-btn.busy{opacity:.6;pointer-events:none}
+.group-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+
+.preview{width:46%;min-width:360px;background:#3a3a39;border-left:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0}
+.preview.hidden{display:none}
+.pv-bar{height:42px;background:#2c2c2b;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
+.pv-dot{width:11px;height:11px;border-radius:50%;background:#565654}
+.pv-url{flex:1;background:#454543;border-radius:6px;height:24px;display:flex;align-items:center;padding:0 12px;font-size:11.5px;color:#b9b7b4}
+.pv-sizes{display:flex;gap:4px}
+.pv-sizes button{background:transparent;border:1px solid #565654;color:#b9b7b4;border-radius:5px;font-size:11px;padding:3px 8px}
+.pv-sizes button.active{background:var(--gold);border-color:var(--gold);color:#241b12}
+.pv-stage{flex:1;overflow:auto;display:flex;justify-content:center;padding:16px;background:#4a4a48}
+#frameHolder{background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.3);transition:width .2s;height:100%}
+#preview-frame{width:100%;height:100%;border:0;display:block}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:10px;font-size:13.5px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .ok{color:#7fd6a0}
+
+.modal{position:fixed;inset:0;background:rgba(20,15,12,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:26px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.modal-box h3{font-family:var(--serif);font-size:21px;font-weight:600;margin-bottom:8px}
+.modal-box p{font-size:14px;color:var(--muted);margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.hide-sm{display:inline}
+@media(max-width:1100px){.preview{display:none}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand"><span class="a">AYP</span><span class="tag">Content Manager</span></div>
+  <div class="top-actions">
+    <span class="status" id="status">All changes kept</span>
+    <button class="btn ghost hide-sm" id="togglePv">Hide preview</button>
+    <input type="file" id="importFile" accept=".js,.json" style="display:none">
+    <button class="btn" id="importBtn">Import</button>
+    <button class="btn" id="resetBtn">Reset</button>
+    <button class="btn" id="exportBtn">Export content.js</button>
+    <button class="btn" id="publishBtn">Publish to browser</button>
+    <button class="btn primary" id="publishServerBtn">Publish to server</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="side" id="side"><h4>Sections</h4></nav>
+  <main class="editor"><div class="editor-inner" id="form"></div></main>
+  <section class="preview" id="preview">
+    <div class="pv-bar">
+      <span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span>
+      <span class="pv-url">azizyanuarpartners.com · live preview</span>
+      <div class="pv-sizes">
+        <button data-w="100%" class="active">Desktop</button>
+        <button data-w="390px">Mobile</button>
+      </div>
+    </div>
+    <div class="pv-stage"><div id="frameHolder" style="width:100%"><iframe id="preview-frame" src="index.html"></iframe></div></div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Are you sure?</h3>
+    <p id="modalMsg"></p>
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel">Cancel</button>
+      <button class="btn primary" id="modalOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="content.js"></script>
+<script>
+(function(){
+  "use strict";
+  var STORAGE_KEY = "ayp_content";
+
+  /*
+   * SERVER_TOKEN authorizes uploads and publishing.
+   * Must match AYP_TOKEN inside config.php.
+   */
+  var SERVER_TOKEN = "ayp_9mQ2xVc7hR4tK1nZ";
+  var UPLOAD_URL = "upload.php";
+  var SAVE_URL = "save.php";
+
+  /* ---------- content schema ---------- */
+  var SCHEMA = [
+    { id:"brand", title:"Brand & Navigasi", desc:"Identitas firma, logo, dan menu navigasi.",
+      fields:[
+        { p:"brand.name", l:"Nama Firma", t:"text" },
+        { p:"brand.tagline", l:"Tagline", t:"text" },
+        { p:"brand.logoImage", l:"Logo", t:"image" },
+        { p:"nav.cta", l:"Teks Tombol CTA di Nav", t:"text" }
+      ],
+      lists:[
+        { p:"nav.links", l:"Menu Navigasi", add:"Add menu item", item:[
+          { k:"label", l:"Label", t:"text" },
+          { k:"href", l:"Link (#anchor)", t:"text" }
+        ]}
+      ]
+    },
+    { id:"hero", title:"Hero", desc:"Bagian paling atas halaman (3 foto latar berganti otomatis).",
+      fields:[
+        { p:"hero.kicker", l:"Kicker", t:"text" },
+        { p:"hero.headlineHtml", l:"Judul Utama", t:"textarea", hint:"Boleh pakai <em>...</em> untuk teks miring" },
+        { p:"hero.sub", l:"Sub-judul", t:"textarea" },
+        { p:"hero.ctaPrimary", l:"Tombol Utama", t:"text" },
+        { p:"hero.ctaSecondary", l:"Tombol Kedua", t:"text" }
+      ],
+      lists:[
+        { p:"hero.images", l:"Foto Latar Hero (3 foto bergantian)", item:"string", isImage:true }
+      ]
+    },
+    { id:"about", title:"Tentang Kami", desc:"Narasi firma di bagian 'Tentang'.",
+      fields:[
+        { p:"about.tag", l:"Label Kecil", t:"text" },
+        { p:"about.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"about.enParagraph", l:"Paragraf Bahasa Inggris", t:"textarea" },
+        { p:"about.quote", l:"Kutipan", t:"textarea" },
+        { p:"about.quoteCite", l:"Sumber Kutipan", t:"text" },
+        { p:"about.image", l:"Foto", t:"image" },
+        { p:"about.statNum", l:"Angka Statistik", t:"text" },
+        { p:"about.statCap", l:"Keterangan Statistik", t:"textarea" }
+      ],
+      lists:[
+        { p:"about.paragraphs", l:"Paragraf Narasi (Bahasa Indonesia)", item:"string", big:true }
+      ]
+    },
+    { id:"services", title:"Layanan (Pasal Hukum)", desc:"Bidang praktik, disusun seperti kitab hukum.",
+      fields:[
+        { p:"services.tag", l:"Label Kecil", t:"text" },
+        { p:"services.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"services.intro", l:"Deskripsi Singkat", t:"textarea" },
+        { p:"services.bagianSatu.title", l:"Judul Bagian I", t:"text" },
+        { p:"services.bagianSatu.desc", l:"Deskripsi Bagian I", t:"textarea" },
+        { p:"services.bagianDua.title", l:"Judul Bagian II", t:"text" },
+        { p:"services.bagianDua.desc", l:"Deskripsi Bagian II", t:"textarea" }
+      ],
+      lists:[
+        { p:"services.pasal", l:"Daftar Pasal (urut 01→15, 13 pertama = Bagian I, 2 terakhir = Bagian II)", add:"Add pasal", item:[
+          { k:"num", l:"Nomor Pasal", t:"text" },
+          { k:"title", l:"Judul", t:"text" },
+          { k:"desc", l:"Deskripsi", t:"textarea" }
+        ]}
+      ]
+    },
+    { id:"team", title:"Tim", desc:"Profil advokat.",
+      fields:[
+        { p:"team.tag", l:"Label Kecil", t:"text" },
+        { p:"team.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"team.intro", l:"Deskripsi Singkat", t:"textarea" }
+      ],
+      lists:[
+        { p:"team.members", l:"Anggota Tim", add:"Add anggota", item:[
+          { k:"name", l:"Nama", t:"text" },
+          { k:"role", l:"Jabatan", t:"text" },
+          { k:"bio", l:"Bio", t:"textarea" },
+          { k:"image", l:"Foto", t:"image" }
+        ]}
+      ]
+    },
+    { id:"insight", title:"Insight & Artikel", desc:"Artikel hukum yang tampil sebagai kartu dan modal detail.",
+      fields:[
+        { p:"insight.tag", l:"Label Kecil", t:"text" },
+        { p:"insight.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"insight.intro", l:"Deskripsi Singkat", t:"textarea" },
+        { p:"insight.footNote", l:"Catatan di Bawah Grid", t:"textarea" },
+        { p:"insight.footCta", l:"Teks Tombol di Bawah Grid", t:"text" }
+      ],
+      lists:[
+        { p:"insight.articles", l:"Artikel", add:"Add artikel", item:[
+          { k:"id", l:"ID unik (huruf kecil, tanpa spasi)", t:"text" },
+          { k:"tag", l:"Kategori", t:"text" },
+          { k:"title", l:"Judul Artikel", t:"textarea" },
+          { k:"excerpt", l:"Ringkasan (tampil di kartu)", t:"textarea" },
+          { k:"date", l:"Tanggal Singkat (mis. Agu 2026)", t:"text" },
+          { k:"dateFull", l:"Tanggal Lengkap (mis. Agustus 2026)", t:"text" },
+          { k:"read", l:"Estimasi Waktu Baca", t:"text" },
+          { k:"image", l:"Foto Artikel", t:"image" },
+          { k:"bodyHtml", l:"Isi Artikel Lengkap (HTML: <p>, <h2>, <div class=\"a-note\">)", t:"textarea" }
+        ]}
+      ]
+    },
+    { id:"kerjasama", title:"Sistem Kerja Sama", desc:"Model hubungan kerja dengan klien.",
+      fields:[
+        { p:"kerjasama.tag", l:"Label Kecil", t:"text" },
+        { p:"kerjasama.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"kerjasama.intro", l:"Deskripsi Singkat", t:"textarea" }
+      ],
+      lists:[
+        { p:"kerjasama.models", l:"Model Kerja Sama", add:"Add model", item:[
+          { k:"idx", l:"Nomor (01, 02, ...)", t:"text" },
+          { k:"title", l:"Nama Model", t:"text" },
+          { k:"desc", l:"Deskripsi", t:"textarea" },
+          { k:"fee", l:"Skema Biaya", t:"text" }
+        ]}
+      ]
+    },
+    { id:"klien", title:"Klien", desc:"Daftar klien per kategori.",
+      fields:[
+        { p:"klien.tag", l:"Label Kecil", t:"text" },
+        { p:"klien.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"klien.intro", l:"Deskripsi Singkat", t:"textarea" }
+      ],
+      lists:[
+        { p:"klien.tiers", l:"Kategori Klien", add:"Add kategori", item:[
+          { k:"label", l:"Nama Kategori", t:"text" },
+          { k:"names", l:"Daftar Nama Klien", t:"stringlist" }
+        ]}
+      ]
+    },
+    { id:"kontak", title:"Kontak", desc:"Info kontak dan form konsultasi.",
+      fields:[
+        { p:"kontak.tag", l:"Label Kecil", t:"text" },
+        { p:"kontak.headingHtml", l:"Judul Section", t:"textarea" },
+        { p:"kontak.intro", l:"Deskripsi Singkat", t:"textarea" },
+        { p:"kontak.phone", l:"Nomor WhatsApp (format 62...)", t:"text" },
+        { p:"kontak.phoneDisplay", l:"Nomor WhatsApp (tampilan)", t:"text" },
+        { p:"kontak.email", l:"Email", t:"text" },
+        { p:"kontak.address", l:"Alamat", t:"textarea" },
+        { p:"kontak.hours", l:"Jam Kerja", t:"text" },
+        { p:"kontak.cardImage", l:"Logo di Kartu Form", t:"image" },
+        { p:"kontak.cardTitle", l:"Judul Kartu Form", t:"text" },
+        { p:"kontak.cardDesc", l:"Deskripsi Kartu Form", t:"textarea" },
+        { p:"kontak.formEndpoint", l:"Endpoint Form (FormSubmit)", t:"text", hint:"Alamat pengiriman email form — jangan diubah kecuali paham" },
+        { p:"kontak.whatsappCta", l:"Teks Tombol WhatsApp", t:"text" }
+      ],
+      lists:[
+        { p:"kontak.topics", l:"Pilihan Topik di Form", item:"string" }
+      ]
+    },
+    { id:"footer", title:"Footer", desc:"Bagian paling bawah situs.",
+      fields:[
+        { p:"footer.copyrightName", l:"Teks Copyright", t:"text" },
+        { p:"footer.address", l:"Alamat Singkat", t:"text" }
+      ]
+    }
+  ];
+
+  var data = load();
+  var current = SCHEMA[0].id;
+  var dirty = false;
+
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+  function load(){
+    try{ var raw = localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+    return deepClone(window.DEFAULT_CONTENT);
+  }
+  function getPath(obj,path){ return path.split(".").reduce(function(o,k){ return o==null?undefined:o[k]; }, obj); }
+  function setPath(obj,path,val){
+    var ks=path.split("."), o=obj;
+    for(var i=0;i<ks.length-1;i++){ if(o[ks[i]]==null||typeof o[ks[i]]!=="object") o[ks[i]]={}; o=o[ks[i]]; }
+    o[ks[ks.length-1]]=val;
+  }
+
+  function el(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+
+  var frame = document.getElementById("preview-frame");
+  window.addEventListener("message", function(e){ if(e.data && e.data.type==="ayp-ready"){ pushPreview(); } });
+  function pushPreview(){
+    if(!frame || !frame.contentWindow) return;
+    try{ frame.contentWindow.postMessage({type:"ayp-content", content:data}, "*"); }catch(e){}
+  }
+  var saveTimer=null;
+  function markDirty(){
+    dirty=true; setStatus("Editing…", false);
+    pushPreview();
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer=setTimeout(function(){ persist(true); }, 500);
+  }
+  function persist(silent){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); dirty=false; setStatus("All changes saved", true); }
+    catch(e){ setStatus("Saved in memory", false); }
+    if(!silent) toast("Saved to this browser");
+  }
+  function setStatus(txt,saved){ var s=document.getElementById("status"); s.textContent=txt; s.className="status"+(saved?" saved":""); }
+
+  function makeInput(t,val,onChange){
+    var e;
+    if(t==="textarea"||t==="rich"){ e=el("textarea"); e.value=val==null?"":val; }
+    else { e=el("input"); e.type="text"; e.value=val==null?"":val; }
+    e.addEventListener("input", function(){ onChange(e.value); });
+    return e;
+  }
+
+  function uploadImage(file, cb){
+    var fd=new FormData(); fd.append("token", SERVER_TOKEN); fd.append("image", file);
+    fetch(UPLOAD_URL, { method:"POST", body:fd })
+      .then(function(r){ return r.json(); })
+      .then(function(j){ if(j && j.ok && j.path){ cb(null, j.path); } else { cb((j && j.error) || "unknown error"); } })
+      .catch(function(e){ cb("cannot reach upload.php ("+(e && e.message || e)+")"); });
+  }
+
+  function imageControl(getVal, setVal){
+    var wrap=el("div","imgctl");
+    var thumb=el("div","imgthumb");
+    var meta=el("div","imgmeta");
+    var pathInp=el("input","imgpath"); pathInp.type="text"; pathInp.placeholder="img/nama-file.jpg — atau unggah →";
+    var btns=el("div","imgbtns");
+    var upLabel=el("label","mini-btn"); upLabel.textContent="Upload";
+    var fileInp=el("input"); fileInp.type="file"; fileInp.accept="image/*"; fileInp.style.display="none";
+    var clearBtn=el("button","mini-btn"); clearBtn.type="button"; clearBtn.textContent="Clear";
+    function paint(){
+      var v=getVal(); v=v==null?"":v;
+      if(v){ thumb.innerHTML='<img src="'+String(v).replace(/"/g,"&quot;")+'" alt="">'; thumb.classList.add("has"); }
+      else { thumb.textContent="IMG"; thumb.classList.remove("has"); }
+      if(pathInp.value!==v) pathInp.value=v;
+    }
+    pathInp.addEventListener("input", function(){ setVal(pathInp.value); markDirty(); paint(); });
+    fileInp.addEventListener("change", function(){
+      var f=fileInp.files&&fileInp.files[0]; if(!f) return;
+      upLabel.classList.add("busy"); upLabel.textContent="Uploading…";
+      uploadImage(f, function(err, path){
+        upLabel.textContent="Upload"; upLabel.classList.remove("busy");
+        if(err){ toast("Upload gagal: "+err); }
+        else { setVal(path); markDirty(); paint(); }
+      });
+      fileInp.value="";
+    });
+    clearBtn.addEventListener("click", function(){ setVal(""); markDirty(); paint(); });
+    upLabel.appendChild(fileInp);
+    btns.appendChild(upLabel); btns.appendChild(clearBtn);
+    meta.appendChild(pathInp); meta.appendChild(btns);
+    wrap.appendChild(thumb); wrap.appendChild(meta);
+    paint();
+    return wrap;
+  }
+
+  function fieldRow(def){
+    var f=el("div","field");
+    var lbl=el("label"); lbl.innerHTML=def.l+(def.hint?' <span class="hint">— '+def.hint+"</span>":"");
+    f.appendChild(lbl);
+    if(def.t==="image"){
+      f.appendChild(imageControl(
+        function(){ return getPath(data,def.p); },
+        function(v){ setPath(data,def.p,v); }
+      ));
+    } else {
+      f.appendChild(makeInput(def.t, getPath(data,def.p), function(v){ setPath(data,def.p,v); markDirty(); }));
+    }
+    return f;
+  }
+
+  function iconBtn(sym,extra,fn){ var b=el("button","icon-btn"+(extra?" "+extra:""),sym); b.type="button"; b.addEventListener("click",fn); return b; }
+
+  function stringListEditor(arr, opts){
+    opts=opts||{};
+    var box=el("div");
+    function draw(){
+      box.innerHTML="";
+      arr.forEach(function(v,i){
+        if(opts.isImage){
+          var row=el("div","card");
+          row.appendChild(imageControl(
+            function(){ return arr[i]; },
+            function(val){ arr[i]=val; }
+          ));
+          var tools=el("div","card-tools"); tools.style.marginTop="8px";
+          tools.appendChild(iconBtn("↑","",function(){ if(i>0){ arr.splice(i-1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+          tools.appendChild(iconBtn("↓","",function(){ if(i<arr.length-1){ arr.splice(i+1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+          tools.appendChild(iconBtn("✕","danger",function(){ arr.splice(i,1); markDirty(); draw(); }));
+          row.appendChild(tools);
+          box.appendChild(row);
+          return;
+        }
+        var row=el("div","strrow");
+        var inp; if(opts.big){ inp=el("textarea"); } else { inp=el("input"); inp.type="text"; }
+        inp.value=v==null?"":v; inp.style.flex="1";
+        inp.addEventListener("input", function(){ arr[i]=inp.value; markDirty(); });
+        row.appendChild(inp);
+        row.appendChild(iconBtn("↑","",function(){ if(i>0){ arr.splice(i-1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+        row.appendChild(iconBtn("↓","",function(){ if(i<arr.length-1){ arr.splice(i+1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+        row.appendChild(iconBtn("✕","danger",function(){ arr.splice(i,1); markDirty(); draw(); }));
+        box.appendChild(row);
+      });
+      var add=el("button","add-btn","+ Add"); add.addEventListener("click",function(){ arr.push(opts.isImage?"":""); markDirty(); draw(); }); box.appendChild(add);
+    }
+    draw();
+    return box;
+  }
+
+  function objectListEditor(listDef){
+    var arr=getPath(data,listDef.p); if(!Array.isArray(arr)){ arr=[]; setPath(data,listDef.p,arr); }
+    var wrap=el("div");
+    wrap.appendChild(el("div","group-lbl",listDef.l));
+    var box=el("div"); wrap.appendChild(box);
+    function blank(){ var o={}; listDef.item.forEach(function(fd){ if(fd.t==="stringlist") o[fd.k]=[]; else o[fd.k]=""; }); return o; }
+    function draw(){
+      box.innerHTML="";
+      arr.forEach(function(item,i){
+        var card=el("div","card");
+        var head=el("div","card-head");
+        head.appendChild(el("span","idx",(listDef.l.replace(/s$/,""))+" "+(i+1)));
+        var tools=el("div","card-tools");
+        tools.appendChild(iconBtn("↑","",function(){ if(i>0){ arr.splice(i-1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+        tools.appendChild(iconBtn("↓","",function(){ if(i<arr.length-1){ arr.splice(i+1,0,arr.splice(i,1)[0]); markDirty(); draw(); } }));
+        tools.appendChild(iconBtn("✕","danger",function(){ arr.splice(i,1); markDirty(); draw(); }));
+        head.appendChild(tools); card.appendChild(head);
+
+        listDef.item.forEach(function(fd){
+          if(fd.t==="stringlist"){
+            var f=el("div","field"); f.appendChild(el("label",null,fd.l));
+            if(!Array.isArray(item[fd.k])) item[fd.k]=[];
+            f.appendChild(stringListEditor(item[fd.k],{})); card.appendChild(f);
+          } else if(fd.t==="image"){
+            var fi=el("div","field");
+            var lbi=el("label"); lbi.innerHTML=fd.l+(fd.hint?' <span class="hint">— '+fd.hint+"</span>":""); fi.appendChild(lbi);
+            (function(it,key){
+              fi.appendChild(imageControl(
+                function(){ return it[key]; },
+                function(v){ it[key]=v; }
+              ));
+            })(item,fd.k);
+            card.appendChild(fi);
+          } else {
+            var f2=el("div","field");
+            var lb=el("label"); lb.innerHTML=fd.l+(fd.hint?' <span class="hint">— '+fd.hint+"</span>":""); f2.appendChild(lb);
+            var inp=makeInput(fd.t,item[fd.k],function(v){ item[fd.k]=v; markDirty(); });
+            f2.appendChild(inp); card.appendChild(f2);
+          }
+        });
+        box.appendChild(card);
+      });
+      var add=el("button","add-btn","+ "+(listDef.add||"Add item")); add.addEventListener("click",function(){ arr.push(blank()); markDirty(); draw(); }); box.appendChild(add);
+    }
+    draw();
+    return wrap;
+  }
+
+  function renderSection(id){
+    current=id;
+    var def=SCHEMA.filter(function(s){return s.id===id;})[0];
+    var form=document.getElementById("form"); form.innerHTML="";
+    form.appendChild(el("div","sec-title",def.title));
+    if(def.desc) form.appendChild(el("div","sec-desc",def.desc));
+    (def.fields||[]).forEach(function(fd){ form.appendChild(fieldRow(fd)); });
+    (def.lists||[]).forEach(function(ld){
+      if(ld.item==="string"){
+        var w=el("div"); w.appendChild(el("div","group-lbl",ld.l));
+        var arr=getPath(data,ld.p); if(!Array.isArray(arr)){ arr=[]; setPath(data,ld.p,arr); }
+        w.appendChild(stringListEditor(arr, {big:ld.big, isImage:ld.isImage})); form.appendChild(w);
+      } else {
+        form.appendChild(objectListEditor(ld));
+      }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".side a"), function(a){ a.classList.toggle("active", a.getAttribute("data-id")===id); });
+    document.querySelector(".editor").scrollTop=0;
+  }
+
+  function buildSidebar(){
+    var side=document.getElementById("side");
+    SCHEMA.forEach(function(s){
+      var a=el("a",null,'<span class="dot"></span>'+s.title); a.href="#"+s.id; a.setAttribute("data-id",s.id);
+      a.addEventListener("click", function(ev){ ev.preventDefault(); renderSection(s.id); });
+      side.appendChild(a);
+    });
+  }
+
+  var toastTimer=null;
+  function toast(msg){ var t=document.getElementById("toast"); t.innerHTML='<span class="ok">✓</span> '+msg; t.classList.add("show"); if(toastTimer)clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove("show"); },2200); }
+  function confirmModal(title,msg,onOk){
+    document.getElementById("modalTitle").textContent=title;
+    document.getElementById("modalMsg").textContent=msg;
+    var m=document.getElementById("modal"); m.classList.add("show");
+    var ok=document.getElementById("modalOk"), cancel=document.getElementById("modalCancel");
+    function close(){ m.classList.remove("show"); ok.onclick=null; cancel.onclick=null; }
+    ok.onclick=function(){ close(); onOk(); }; cancel.onclick=close;
+  }
+
+  function download(filename, text){
+    var blob=new Blob([text],{type:"text/plain"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); },100);
+  }
+  function publishToServer(){
+    var header="/* Aziz Yanuar & Partners Website — Content Source (published from the CMS) */\n";
+    var body=header+"window.DEFAULT_CONTENT = "+JSON.stringify(data,null,2)+";\n";
+    var fd=new FormData(); fd.append("token", SERVER_TOKEN); fd.append("content", body);
+    setStatus("Publishing to server…", false);
+    fetch(SAVE_URL, { method:"POST", body:fd })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(j && j.ok){ persist(true); toast("Published to your live site"); setStatus("Published to server", true); }
+        else { toast("Publish failed: "+((j && j.error) || "unknown error")); setStatus("Publish failed", false); }
+      })
+      .catch(function(e){ toast("Publish failed: cannot reach save.php"); setStatus("Publish failed", false); });
+  }
+  function exportContentJs(){
+    var header="/* Aziz Yanuar & Partners Website — Content Source (exported from the CMS)\n"+
+      "   Replace content.js on your site with this file to publish these changes. */\n";
+    download("content.js", header+"window.DEFAULT_CONTENT = "+JSON.stringify(data,null,2)+";\n");
+    toast("content.js downloaded");
+  }
+  function importContent(file){
+    var reader=new FileReader();
+    reader.onload=function(){
+      var txt=String(reader.result||""); var obj=null;
+      try{
+        if(/window\.DEFAULT_CONTENT/.test(txt)){
+          var m=txt.replace(/^[\s\S]*?window\.DEFAULT_CONTENT\s*=\s*/, "").replace(/;\s*$/, "");
+          obj=JSON.parse(m);
+        } else { obj=JSON.parse(txt); }
+      }catch(e){ toast("Could not read that file"); return; }
+      if(obj && typeof obj==="object"){ data=obj; persist(true); renderSection(current); pushPreview(); toast("Content imported"); }
+    };
+    reader.readAsText(file);
+  }
+
+  document.getElementById("publishBtn").addEventListener("click", function(){ persist(false); });
+  document.getElementById("publishServerBtn").addEventListener("click", function(){
+    confirmModal("Publish ke server?", "Ini akan menimpa content.js di server dengan versi yang sedang Anda edit.", publishToServer);
+  });
+  document.getElementById("exportBtn").addEventListener("click", exportContentJs);
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    confirmModal("Reset semua konten?", "Ini mengembalikan konten ke versi asli dan membatalkan perubahan Anda di browser ini.", function(){
+      data=deepClone(window.DEFAULT_CONTENT); try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      renderSection(current); pushPreview(); toast("Content reset");
+    });
+  });
+  document.getElementById("importBtn").addEventListener("click", function(){ document.getElementById("importFile").click(); });
+  document.getElementById("importFile").addEventListener("change", function(e){ if(e.target.files[0]) importContent(e.target.files[0]); e.target.value=""; });
+  document.getElementById("togglePv").addEventListener("click", function(){
+    var pv=document.getElementById("preview"); pv.classList.toggle("hidden");
+    this.textContent=pv.classList.contains("hidden")?"Show preview":"Hide preview";
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".pv-sizes button"), function(b){
+    b.addEventListener("click", function(){
+      Array.prototype.forEach.call(document.querySelectorAll(".pv-sizes button"), function(x){ x.classList.remove("active"); });
+      b.classList.add("active"); document.getElementById("frameHolder").style.width=b.getAttribute("data-w");
+    });
+  });
+  window.addEventListener("beforeunload", function(){ if(dirty){ persist(true); } });
+
+  buildSidebar();
+  renderSection(SCHEMA[0].id);
+  frame.addEventListener("load", function(){ pushPreview(); });
+})();
+</script>
+</body>
+</html>
