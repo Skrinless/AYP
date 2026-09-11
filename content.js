@@ -149,7 +149,7 @@ window.DEFAULT_CONTENT = {
   },
   "team": {
     "tag": "Tim Kami",
-    "headingHtml": "Advokat yang tergabung dalam PERADI, terjun langsung menangani setiap perkara.",
+    "headingHtml": "Advokat yang perkara.",
     "intro": "Ketiganya aktif beracara di berbagai tingkat peradilan — dari Pengadilan Negeri hingga Mahkamah Konstitusi.",
     "members": [
       {
